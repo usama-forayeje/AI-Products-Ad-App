@@ -4,7 +4,7 @@ import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-function Authentication({ children }: any) {
+function Authentication({ children }: { children: React.ReactNode }) {
   const provider = new GoogleAuthProvider();
   const router = useRouter();
 

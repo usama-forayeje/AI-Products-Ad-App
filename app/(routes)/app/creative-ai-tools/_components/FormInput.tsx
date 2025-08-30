@@ -14,8 +14,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 
 interface Props {
-  onHandleInputChange: any;
-  onGenerate: any;
+  onHandleInputChange: (field: string, value: unknown) => void;
+  onGenerate: () => void;
   loading: boolean;
 }
 
