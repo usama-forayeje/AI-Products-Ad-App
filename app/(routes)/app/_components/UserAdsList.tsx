@@ -21,7 +21,7 @@ function UserAdsList() {
             height={200}
             className="w-20"
           />
-          <h2 className="text-xl">You don't have any ads create a new ad.</h2>
+          <h2 className="text-xl">You don&apos;t have any ads create a new ad.</h2>
           <Button className="ml-5">
             <Link href={"/create-ad"}>Create New Ad</Link>
           </Button>
