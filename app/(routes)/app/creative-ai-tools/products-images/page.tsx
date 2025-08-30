@@ -15,8 +15,14 @@ const ProductImages = () => {
   const [formData, setFormData] = useState<FormData>();
   const [loading, setLoading] = useState(false);
 
-  const onHandleInputChange = (field: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  const onHandleInputChange = (field: string, value: unknown) => {
+    setFormData((prev: FormData | undefined) => ({
+      file: prev?.file ?? null,
+      description: prev?.description ?? "",
+      size: prev?.size ?? "",
+      imageUrl: prev?.imageUrl,
+      [field]: value,
+    }));
   };
 
   const OnGenerate = async () => {
@@ -40,7 +46,6 @@ const ProductImages = () => {
     const result = await axios.post("/api/generate-product-image", formPayload);
     console.log(result.data);
     setLoading(false);
-    
   };
 
   return (
@@ -49,7 +54,7 @@ const ProductImages = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 ">
         <div>
           <FormInput
-            onHandleInputChange={(field: string, value: string) =>
+            onHandleInputChange={(field: string, value: string | unknown) =>
               onHandleInputChange(field, value)
             }
             onGenerate={OnGenerate}
