@@ -361,16 +361,16 @@ const AIProductGenerator = () => {
             {[
               {
                 icon: Sparkles,
-                title: "Endless Ideas",
+                title: "Endless Ads Ideas",
                 description:
-                  "Get an endless number of product ideas quickly with AI.",
+                  "Get an endless number of product ads quickly with AI.",
                 color: "blue",
               },
               {
                 icon: Edit3,
                 title: "Easy Customization",
                 description:
-                  "Customize the generated ideas to fit your specific needs.",
+                  "Customize the generated ads to fit your specific needs.",
                 color: "violet",
               },
               {
@@ -384,7 +384,7 @@ const AIProductGenerator = () => {
                 icon: Clock,
                 title: "Instant Results",
                 description:
-                  "Get effective and creative product ideas in seconds.",
+                  "Get effective and creative product ads in seconds.",
                 color: "orange",
               },
             ].map((feature, index) => {

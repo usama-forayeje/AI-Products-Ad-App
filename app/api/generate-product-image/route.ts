@@ -182,6 +182,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
+        message: "Failed to generate product ad",
         error: "Failed to generate product ad",
         details: errorMessage,
       },
