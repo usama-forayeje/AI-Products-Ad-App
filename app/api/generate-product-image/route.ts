@@ -38,21 +38,24 @@ export async function POST(
 
     if (!userEmail) {
       return NextResponse.json(
-        { success: false, error: "User email is required" },
+        { success: false, message: "User email is required" },
         { status: 400 }
       );
     }
 
     if (!description) {
       return NextResponse.json(
-        { success: false, error: "Product description is required" },
+        { success: false, message: "Product description is required" },
         { status: 400 }
       );
     }
 
     if (!file && !imageUrl) {
       return NextResponse.json(
-        { success: false, error: "Please provide either a file or image URL" },
+        {
+          success: false,
+          message: "Please provide either a file or image URL",
+        },
         { status: 400 }
       );
     }
