@@ -65,9 +65,10 @@ Please create professional marketing prompts for this product.`;
     const messages: ChatCompletionMessageParam[] = [
       {
         role: "system",
-        content: avatar && avatar.length > 2
-          ? avatarSystemPrompt
-          : systemPrompt.trim(),
+        content:
+          avatar && avatar.length > 2
+            ? avatarSystemPrompt
+            : systemPrompt.trim(),
       },
       { role: "user", content: userContent },
     ];
@@ -131,9 +132,6 @@ export async function generateProductImage(
 
       const response = await model.generateContent({
         contents: [{ role: "user", parts }],
-        generationConfig: {
-          responseModalities: ["IMAGE"],
-        },
       });
 
       const candidate = response.response?.candidates?.[0];
