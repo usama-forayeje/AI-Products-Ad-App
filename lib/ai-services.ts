@@ -42,7 +42,10 @@ Please create professional marketing prompts for this product.`;
     const messages: ChatCompletionMessageParam[] = [
       {
         role: "system",
-        content: avatar?.length > 2 ? avatarSystemPrompt : systemPrompt.trim(),
+        content:
+          avatar && avatar.length > 2
+            ? avatarSystemPrompt
+            : systemPrompt.trim(),
       },
       { role: "user", content: userPrompt },
     ];

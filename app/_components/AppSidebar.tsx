@@ -1,3 +1,4 @@
+// app/components/app/app-sidebar.tsx
 import * as React from "react";
 import {
   ChevronRight,
@@ -12,9 +13,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -24,13 +22,9 @@ import {
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "../provider";
 import { SearchForm } from "./search-form";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import Link from "next/link";
 import { NavUser } from "./nav-user";
+import Image from "next/image";
 
 const data = [
   {
@@ -40,22 +34,22 @@ const data = [
   },
   {
     title: "Creative Tools",
-    url: "/creative-tools",
+    url: "/app",
     icon: Inbox,
   },
   {
     title: "My Ads",
-    url: "/my-ads",
+    url: "/app/my-ads",
     icon: MegaphoneIcon,
   },
   {
     title: "Upgrade",
-    url: "/upgrade",
+    url: "/app",
     icon: Wallet2Icon,
   },
   {
     title: "Settings",
-    url: "#",
+    url: "/app",
     icon: Settings,
   },
 ];
@@ -66,56 +60,51 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const displayName = user?.displayName;
   const photoURL = user?.photoURL;
   const email = user?.email;
-  
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        {/* <VersionSwitcher
-          versions={data.versions}
-          defaultVersion={data.versions[0]}
-        /> */}
-        <SearchForm />
+        <Link href="/app" className="flex items-center gap-2 px-4 py-2">
+          {/* Replace this with your actual logo component or image */}
+          <Image
+            width={32}
+            height={32}
+            src="/your-logo.svg"
+            alt="AI Ads Generator Logo"
+            className="h-8 w-auto"
+          />
+          <span className="text-xl font-bold">AI Ads Generator</span>
+        </Link>
       </SidebarHeader>
-      <SidebarContent className="gap-0">
-        {/* We create a collapsible SidebarGroup for each parent. */}
-        {data.map((item) => (
-          <Collapsible
-            key={item.title}
-            title={item.title}
-            defaultOpen
-            className="group/collapsible"
-          >
-            <SidebarGroup>
-              <SidebarGroupLabel
-                asChild
-                className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
-              >
-                <CollapsibleTrigger>
-                  {item.title}{" "}
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={path === item.url}>
-                        <Link
-                          href={item.url}
-                          className="flex items-center gap-2"
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.title}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
-        ))}
+
+      <SidebarContent>
+        <SidebarMenu>
+          {data.map((item) => {
+            const isActive = path === item.url;
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  className={`
+                    w-full text-left py-3 px-4 rounded-lg transition-colors
+                    ${
+                      isActive
+                        ? "bg-primary text-primary-foreground font-semibold shadow-md"
+                        : "hover:bg-accent hover:text-accent-foreground text-gray-500 dark:text-gray-400"
+                    }
+                  `}
+                >
+                  <Link href={item.url} className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5" />
+                    <span className="text-base">{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
       </SidebarContent>
+
       <SidebarRail />
 
       <SidebarFooter>
@@ -130,6 +119,3 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
- 
-        
-     
