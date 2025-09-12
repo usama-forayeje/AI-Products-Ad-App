@@ -95,7 +95,7 @@ function PreviewResult() {
   type VideoConfig = {
     finalProductUrl?: string;
     imageToVideoPrompt?: string;
-    id: string;
+    id?: string;
   };
 
   // 🔹 Generate Video Function - Corrected Type
@@ -142,7 +142,9 @@ function PreviewResult() {
                 // Skeleton/Loading State
                 <div className="flex flex-col items-center justify-center h-[200px] rounded-lg bg-gray-200 dark:bg-gray-800">
                   <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
-                  <p className="text-muted-foreground mt-2">Generating Image...</p>
+                  <p className="text-muted-foreground mt-2">
+                    Generating Image...
+                  </p>
                 </div>
               ) : (
                 <>
@@ -197,14 +199,14 @@ function PreviewResult() {
 
                     {/* Animate */}
                     {product.imageToVideoStatus === "pending" ? (
-                        <Button
-                          className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
-                          disabled
-                        >
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Processing...</span>
-                        </Button>
-                      ) : (
+                      <Button
+                        className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
+                        disabled
+                      >
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Processing...</span>
+                      </Button>
+                    ) : (
                       <Button
                         className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
                         onClick={() => GenerateVideo(product)}
@@ -226,3 +228,5 @@ function PreviewResult() {
 }
 
 export default PreviewResult;
+
+
