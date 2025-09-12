@@ -32,8 +32,8 @@ const ProductImages = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user)  router.replace("/login");
-  }, [user]);
+    if (!user) router.replace("/login");
+  }, [user, router]);
 
   const onHandleInputChange = (field: string, value: unknown) => {
     setFormData((prev) => ({

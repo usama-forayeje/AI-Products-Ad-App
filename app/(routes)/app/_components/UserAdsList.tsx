@@ -71,7 +71,8 @@ function UserAdsList() {
       // Sort by creation date, most recent first
       matchDocs.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
       );
       setAdsList(matchDocs);
       setLoading(false);
@@ -184,9 +185,7 @@ function UserAdsList() {
             You don&apos;t have any ads. Let&apos;s create a new one!
           </h2>
           <Button>
-            <Link
-              href={user ? "/creative-ai-tools/products-images" : "/login"}
-            >
+            <Link href={user ? "/creative-ai-tools/products-images" : "/login"}>
               Create New Ad
             </Link>
           </Button>
