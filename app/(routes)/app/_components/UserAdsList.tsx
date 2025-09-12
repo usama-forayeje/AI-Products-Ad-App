@@ -230,7 +230,7 @@ function UserAdsList() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => downloadImage(ad.finalProductUrl)}
+                    onClick={() => downloadImage(ad.finalProductUrl!)}
                     disabled={ad.status !== "completed"}
                   >
                     <Download size={16} />

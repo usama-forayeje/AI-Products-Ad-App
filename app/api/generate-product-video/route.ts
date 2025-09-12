@@ -26,8 +26,9 @@ export async function POST(req: NextRequest) {
         prompt: imageToVideoPrompt,
       },
     });
-
-    const videoUrl = output.url(); // replicate returns a URL
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const videoUrl = output?.url(); // replicate returns a URL
 
     // 3️⃣ Fetch video from URL
     const response = await fetch(videoUrl);
