@@ -1,18 +1,18 @@
 import ImageKit from "imagekit";
+import { Transformation } from "imagekit/dist/libs/interfaces/Transformation";
 
 export const imagekit = new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
-  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_URL!,
-  privateKey: process.env.NEXT_PUBLIC_IMAGEKIT_PRIVET_KEY!,
+  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
+  privateKey: process.env.NEXT_PUBLIC_IMAGEKIT_PRIVATE_KEY!,
 });
 
-// Corrected function with proper typing
 export const getImageKitUrl = (
   filePath: string,
-  transformations?: ImageKit.Transformation[]
+  transformation?: Transformation[]
 ) => {
   return imagekit.url({
     path: filePath,
-    transformation: transformations,
+    transformation: transformation,
   });
 };
