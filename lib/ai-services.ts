@@ -2,7 +2,11 @@
 import { serverOpenAI } from "@/lib/openAI";
 import { AIPrompts } from "@/types/product-ad";
 import { genAI } from "./gimini";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import {
+  ChatCompletionMessageParam,
+  ChatCompletionContentPart,
+} from "openai/resources/chat/completions";
+import { Part } from "@google/generative-ai";
 
 /**
  * 🎨 Generate AI prompts using OpenAI (SERVER-SIDE ONLY)
@@ -27,10 +31,10 @@ Return ONLY valid JSON in EXACT format:
 }
 No extra text or explanation.`;
 
-    const avatarSystemPrompt = `Create a vibrant product showcase image featuring the uploaded product image being heid naturally by the uploaded avatar image. 
-Position the product clearly in te avatar's hands, making it the fooal point of the scene. Surround the product with dynamic splashes of liquid or relevant materials that complement the product.
-use a clean, coloful background to make the product stand out. Add subtle floating elements related to the product's flavor , ingredients. or theme for extra context and visual interest.
-Ensure both the avatar and product are sharp, well-lit, and in focus. , while motion and energy are conveyed though the spiash effects. also give me image to video prompt for same in JSON format: {
+    const avatarSystemPrompt = `Create a vibrant product showcase image featuring the uploaded product image being held naturally by the uploaded avatar image. 
+Position the product clearly in the avatar's hands, making it the focal point of the scene. Surround the product with dynamic splashes of liquid or relevant materials that complement the product.
+Use a clean, colorful background to make the product stand out. Add subtle floating elements related to the product's flavor, ingredients, or theme for extra context and visual interest.
+Ensure both the avatar and product are sharp, well-lit, and in focus, while motion and energy are conveyed though the splash effects. Also give me image to video prompt for same in JSON format: {
 "textToImage": "<detailed prompt for image generation>"
 "imageToVideo": "<detailed prompt for video generation>",}
 No extra text or explanation.`;
@@ -39,36 +43,34 @@ No extra text or explanation.`;
     
 Please create professional marketing prompts for this product.`;
 
-    const messages: ChatCompletionMessageParam[] = [
-      {
-        role: "system",
-        content:
-          avatar && avatar.length > 2
-            ? avatarSystemPrompt
-            : systemPrompt.trim(),
-      },
-      { role: "user", content: userPrompt },
+    // Initialize user content as an array to handle text and multiple images
+    const userContent: ChatCompletionContentPart[] = [
+      { type: "text", text: userPrompt },
     ];
 
     if (imageBase64) {
-      messages[1].content = [
-        { type: "text", text: userPrompt },
-        {
-          type: "image_url",
-          image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
-        },
-      ];
+      userContent.push({
+        type: "image_url",
+        image_url: { url: `data:image/jpeg;base64,${imageBase64}` },
+      });
     }
 
     if (avatar) {
-      messages[1].content = [
-        { type: "text", text: userPrompt },
-        {
-          type: "image_url",
-          image_url: { url: `data:image/jpeg;base64,${avatar}` },
-        },
-      ];
+      userContent.push({
+        type: "image_url",
+        image_url: { url: `data:image/jpeg;base64,${avatar}` },
+      });
     }
+
+    const messages: ChatCompletionMessageParam[] = [
+      {
+        role: "system",
+        content: avatar && avatar.length > 2
+          ? avatarSystemPrompt
+          : systemPrompt.trim(),
+      },
+      { role: "user", content: userContent },
+    ];
 
     const response = await serverOpenAI.chat.completions.create({
       model: "gpt-4o-mini",
@@ -118,7 +120,7 @@ export async function generateProductImage(
         model: "gemini-2.5-flash-image-preview",
       });
 
-      const parts = [
+      const parts: Part[] = [
         { text: prompt },
         { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
       ];
@@ -128,7 +130,7 @@ export async function generateProductImage(
       }
 
       const response = await model.generateContent({
-        contents: [{ parts }],
+        contents: [{ role: "user", parts }],
         generationConfig: {
           responseModalities: ["IMAGE"],
         },
@@ -147,7 +149,6 @@ export async function generateProductImage(
     } catch (error) {
       console.error(`Attempt ${attempt + 1} failed:`, error);
       if (attempt === MAX_RETRIES - 1) {
-        // If this is the last attempt, re-throw the error
         throw new Error(
           `Failed to generate product image after ${MAX_RETRIES} attempts: ${
             error instanceof Error ? error.message : "Unknown error"
@@ -155,11 +156,9 @@ export async function generateProductImage(
         );
       }
       attempt++;
-      // Wait before retrying (exponential backoff is a good practice)
       await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
     }
   }
 
-  // This line should technically be unreachable, but good for type safety
   throw new Error("Failed to generate product image after all retries.");
 }
