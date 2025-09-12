@@ -32,7 +32,7 @@ const data = [
   },
   {
     title: "Creative Tools",
-    url: "/app/creative",
+    url: "/app/creative-ai-tools/products-images",
     icon: Inbox,
   },
   {
@@ -42,12 +42,12 @@ const data = [
   },
   {
     title: "Upgrade",
-    url: "/app/upgrade",
+    url: "/app",
     icon: Wallet2Icon,
   },
   {
     title: "Settings",
-    url: "/app/settings",
+    url: "/app",
     icon: Settings,
   },
 ];
@@ -68,9 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             height={32}
             src="/Ai-logo.png"
             alt="AI Ads Generator Logo"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full"
           />
-          <span className="text-lg font-semibold">AI Ads Generator</span>
+          <span className="text-lg font-semibold ">AI Ads Generator</span>
         </Link>
       </SidebarHeader>
 
