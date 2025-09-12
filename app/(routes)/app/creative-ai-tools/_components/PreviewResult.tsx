@@ -207,14 +207,16 @@ function PreviewResult() {
                         <span>Processing...</span>
                       </Button>
                     ) : (
-                      <Button
-                        className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
-                        onClick={() => GenerateVideo(product)}
-                        disabled={!product.finalProductUrl}
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        Animate
-                      </Button>
+                      !product?.imageToVideoUrl && (
+                        <Button
+                          className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
+                          onClick={() => GenerateVideo(product)}
+                          disabled={!product.finalProductUrl}
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Animate
+                        </Button>
+                      )
                     )}
                   </div>
                 </>
@@ -228,5 +230,3 @@ function PreviewResult() {
 }
 
 export default PreviewResult;
-
-

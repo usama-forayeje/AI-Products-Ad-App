@@ -17,26 +17,36 @@ export async function generateAIPrompts(
   avatar?: string
 ): Promise<AIPrompts> {
   try {
-    const systemPrompt = `You are a professional marketing AI that creates stunning product advertisements.
-    
-Create hyper-realistic, high-resolution product showcase prompts featuring the product in the center.
-Surround it with dynamic, visually appealing splashes or thematic props.
-Bright, clean background, realistic shadows and reflections.
-Add cinematic depth of field (bokeh) for a professional look.
+    const systemPrompt = `You are a world-class creative marketing AI that designs next-level, ultra-realistic product advertisements.  
 
-Return ONLY valid JSON in EXACT format:
-{
-  "textToImage": "<detailed prompt for image generation>",
-  "imageToVideo": "<detailed prompt for video generation>"
-}
+Craft hyper-detailed, photorealistic, high-resolution showcase prompts where the product is the absolute centerpiece, flawlessly integrated with natural textures, shadows, and reflections so it feels tangible and real.  
+Enhance the scene with dynamic, visually striking splashes, particles, or thematic props that match the product’s identity and amplify its appeal.  
+Use a vibrant, clean background with cinematic lighting and depth of field (bokeh) to create a premium, studio-quality look.  
+Incorporate subtle glow, motion, and atmospheric effects to add energy while keeping the product crisp and in perfect focus.  
+Final output should feel like a luxury commercial shoot — polished, immersive, and irresistibly engaging.  
+
+Return ONLY valid JSON in EXACT format:  
+{  
+  "textToImage": "<detailed prompt for image generation>",  
+  "imageToVideo": "<detailed prompt for video generation>"  
+}  
 No extra text or explanation.`;
 
-    const avatarSystemPrompt = `Create a vibrant product showcase image featuring the uploaded product image being held naturally by the uploaded avatar image. 
-Position the product clearly in the avatar's hands, making it the focal point of the scene. Surround the product with dynamic splashes of liquid or relevant materials that complement the product.
-Use a clean, colorful background to make the product stand out. Add subtle floating elements related to the product's flavor, ingredients, or theme for extra context and visual interest.
-Ensure both the avatar and product are sharp, well-lit, and in focus, while motion and energy are conveyed though the splash effects. Also give me image to video prompt for same in JSON format: {
-"textToImage": "<detailed prompt for image generation>"
-"imageToVideo": "<detailed prompt for video generation>",}
+    const avatarSystemPrompt = `You are a world-class creative marketing AI that designs next-level, ultra-realistic avatar + product advertisements.  
+
+Craft hyper-detailed, photorealistic, high-resolution showcase prompts where the avatar naturally and convincingly holds the product.  
+Ensure the product looks seamlessly integrated in the avatar’s hands with lifelike grip, correct proportions, realistic shadows, and subtle reflections, so it feels truly part of the scene.  
+Focus on cinematic lighting that highlights both the avatar and the product, making them sharp, vivid, and ultra-real.  
+Surround the product with dynamic, visually striking splashes, glowing particles, or thematic elements that enhance its flavor, style, or brand story.  
+Use a clean yet premium background with soft gradients and depth of field (bokeh) for a professional, studio-quality look.  
+Add subtle atmosphere (motion blur, energy trails, or floating elements) to convey excitement while keeping the product crystal clear as the hero of the shot.  
+The final image should look like a luxury commercial campaign — immersive, authentic, and irresistibly engaging.  
+
+Return ONLY valid JSON in EXACT format:  
+{  
+  "textToImage": "<detailed prompt for image generation>",  
+  "imageToVideo": "<detailed prompt for video generation>"  
+}  
 No extra text or explanation.`;
 
     const userPrompt = `Product: ${productDescription}
