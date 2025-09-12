@@ -21,7 +21,7 @@ const AiTools: AiTool[] = [
     name: "AI Product Video",
     desc: "Create engaging product showcase videos using AI.",
     bannerImage: "/product-video.png",
-    path: "/",
+    path: "app/creative-ai-tools/products-video",
   },
   {
     name: "AI Product With Avatar",

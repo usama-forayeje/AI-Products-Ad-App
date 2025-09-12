@@ -21,8 +21,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import ProfileAvatar from "./ProfileAvatar";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "../provider";
 import { SearchForm } from "./search-form";
@@ -68,7 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const displayName = user?.displayName;
   const photoURL = user?.photoURL;
   const email = user?.email;
-  console.log(displayName, photoURL, email);
   
   return (
     <Sidebar {...props}>
@@ -129,18 +126,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             avatar: photoURL ?? "",
           }}
         />
-        {/* {!user ? (
-          <Link href="/login">
-            <Button className="w-full">Sign In</Button>
-          </Link>
-        ) : (
-          <div className="flex gap-3 items-center justify-center w-full">
-            <div className="flex gap-2 items-center justify-start border rounded-lg w-full bg-zinc-900">
-              <ProfileAvatar />
-              <h2>{user?.displayName}</h2>
-            </div>
-          </div>
-        )} */}
       </SidebarFooter>
     </Sidebar>
   );

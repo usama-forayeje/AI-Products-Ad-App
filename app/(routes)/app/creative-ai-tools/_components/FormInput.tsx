@@ -1,6 +1,18 @@
 "use client";
+import { useState } from "react";
+import Image from "next/image";
+import {
+  ImagePlus,
+  Loader2,
+  Monitor,
+  Smartphone,
+  Sparkles,
+  Square,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -8,10 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus, Loader2, Monitor, Smartphone, Sparkles, Square } from "lucide-react";
-import Image from "next/image";
-import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface Props {
   onHandleInputChange: (field: string, value: unknown) => void;
@@ -19,7 +34,7 @@ interface Props {
   loading: boolean;
 }
 
-function FormInput({ onHandleInputChange , onGenerate, loading}: Props) {
+function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
 
   const onFileSelect = (files: FileList | null) => {
@@ -29,6 +44,7 @@ function FormInput({ onHandleInputChange , onGenerate, loading}: Props) {
       alert("File size must be less than 5MB");
       return;
     }
+    onHandleInputChange("imageUrl", null); // Clear imageUrl when a file is selected
     onHandleInputChange("file", file);
     setPreview(URL.createObjectURL(file));
   };
@@ -41,32 +57,42 @@ function FormInput({ onHandleInputChange , onGenerate, loading}: Props) {
     "/juice-can.png",
   ];
 
-  const handleSampleImageClick = (imagePath: string) => {
-    setPreview(imagePath);
-  };
-
   return (
-    <div>
-      <div>
-        <h2 className="font-semibold">1. Upload Product Image</h2>
-        <div className="flex flex-col items-center gap-3">
+    <Card className="shadow-lg border rounded-2xl p-6 space-y-8">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">
+          🚀 Generate Your Product Ad
+        </CardTitle>
+        <CardDescription>
+          Upload or pick a sample, describe your product & generate stunning
+          visuals.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-8">
+        {/* 🔹 Step 1: Upload */}
+        <div>
+          <Label className="text-lg font-semibold">
+            1. Upload Product Image
+          </Label>
           <Label
             htmlFor="file"
-            className="mt-2 border-dashed border-2 rounded-2xl flex flex-col justify-center items-center p-5 min-h-[200px] cursor-pointer w-full relative"
+            className="mt-3 border-dashed border-2 rounded-2xl flex flex-col justify-center items-center p-6 min-h-[200px] cursor-pointer w-full relative hover:bg-muted/40 transition-all"
           >
             {!preview ? (
-              <div className="flex flex-col items-center gap-3">
-                <ImagePlus className="h-8 w-8 opacity-40" />
-                <h2 className="text-xl">Click to upload an image</h2>
-                <p className="opacity-45">upload image upto 5MB</p>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <ImagePlus className="h-10 w-10 opacity-40" />
+                <p className="text-base font-medium">
+                  Click to upload an image
+                </p>
+                <p className="text-sm opacity-45">Max size 5MB</p>
               </div>
             ) : (
               <Image
                 src={preview}
                 alt="preview"
-                layout="fill"
-                objectFit="contain"
-                className="rounded-lg"
+                fill
+                className="object-contain rounded-lg"
               />
             )}
           </Label>
@@ -79,77 +105,97 @@ function FormInput({ onHandleInputChange , onGenerate, loading}: Props) {
           />
         </div>
 
+        {/* 🔹 Step 2: Pick Sample */}
         <div>
-          <h2 className="font-semibold opacity-70 mt-3">
-            2. Select Sample Product to generate
-          </h2>
-          <div className="flex flex-wrap gap-2 mt-2 justify-center sm:justify-start">
+          <Label className="text-lg font-semibold">
+            2. Or Select a Sample Product
+          </Label>
+          <div className="flex flex-wrap gap-3 mt-3 justify-center sm:justify-start">
             {sampleProduct.map((sample, index) => (
-              <div
+              <button
+                type="button"
                 key={index}
-                className=" border rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-all duration-300"
+                onClick={() => {
+                  onHandleInputChange("file", null);
+                  onHandleInputChange("imageUrl", sample);
+                  setPreview(sample);
+                }}
+                className={`border rounded-lg overflow-hidden p-1 hover:scale-105 transition-transform ${
+                  preview === sample ? "ring-2 ring-primary" : ""
+                }`}
               >
                 <Image
                   src={sample}
                   alt={`Sample product ${index + 1}`}
-                  width={100}
-                  height={60}
-                  className="rounded-lg w-[60px] h-[60px] cursor-pointer "
-                  onClick={() => {
-                    setPreview(sample);
-                    onHandleInputChange("imageUrl", sample);
-                  }}
+                  width={70}
+                  height={70}
+                  className="rounded-md w-[70px] h-[70px] object-contain"
                 />
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
-        <div className="mt-8">
-          <h2 className="font-semibold">3. Enter Product Description</h2>
+        {/* 🔹 Step 3: Description */}
+        <div>
+          <Label className="text-lg font-semibold">
+            3. Product Description
+          </Label>
           <Textarea
-            placeholder="Tell us about your product description"
+            placeholder="Tell us about your product..."
             className="mt-2 min-h-[130px]"
             onChange={(e) => onHandleInputChange("description", e.target.value)}
           />
         </div>
 
-        <div className="mt-8">
-          <h2 className="font-semibold">4. Select Image Size</h2>
+        {/* 🔹 Step 4: Resolution */}
+        <div>
+          <Label className="text-lg font-semibold">4. Select Image Size</Label>
           <Select onValueChange={(value) => onHandleInputChange("size", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Resolution" />
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Choose Resolution" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="1024x1024">
                 <div className="flex items-center gap-2">
                   <Square className="h-4 w-4" />
-                  <small>1:1</small>
+                  <small>1:1 (Square)</small>
                 </div>
               </SelectItem>
               <SelectItem value="1536x1024">
                 <div className="flex items-center gap-2">
                   <Monitor className="h-4 w-4" />
-                  <small>16:9</small>
+                  <small>16:9 (Landscape)</small>
                 </div>
               </SelectItem>
               <SelectItem value="1024x1536">
                 <div className="flex items-center gap-2">
                   <Smartphone className="h-4 w-4" />
-                  <small>9:16</small>
+                  <small>9:16 (Portrait)</small>
                 </div>
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </div>
-      <Button className="mt-5 w-full" disabled={loading} onClick={onGenerate}>
-        {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />} Generate
-      </Button>
-      <h2 className="mt-1 text-xs opacity-35 text-center">
-        5 Credits to generate
-      </h2>
-    </div>
+
+        {/* 🔹 Step 5: Generate */}
+        <div className="text-center">
+          <Button
+            className="mt-4 w-full flex items-center justify-center gap-2"
+            disabled={loading}
+            onClick={onGenerate}
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {loading ? "Generating..." : "Generate"}
+          </Button>
+          <p className="mt-2 text-xs opacity-60">⚡ Costs 5 Credits</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

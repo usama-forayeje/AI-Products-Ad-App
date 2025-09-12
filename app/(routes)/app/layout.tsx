@@ -1,12 +1,11 @@
-import React from "react";
+"use client";
+
 import DashboardProvider from "./provider";
 
-function AppLayout({
+export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return <DashboardProvider>{children}</DashboardProvider>;
 }
-
-export default AppLayout;
