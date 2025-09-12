@@ -5,7 +5,6 @@ import { db } from "@/configs/firebaseConfig";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Download, Eye, Loader2, Play, Sparkles } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -25,6 +24,7 @@ export type PreviewProductType = {
   createdAt?: string;
   imageToVideoStatus?: string;
   imageToVideoUrl?: string;
+  imageToVideoPrompt?: string; // Corrected: This was missing in your type
 };
 
 function PreviewResult() {
@@ -46,6 +46,12 @@ function PreviewResult() {
       snapshot.forEach((doc) => {
         matchDocs.push({ id: doc.id, ...doc.data() } as PreviewProductType);
       });
+      // Corrected: Sort by most recent creation date
+      matchDocs.sort(
+        (a, b) =>
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+      );
       setProductsList(matchDocs);
     });
 
@@ -80,21 +86,35 @@ function PreviewResult() {
 
       toast.success("✅ Image downloaded successfully!");
     } catch (error) {
+      console.error("Failed to download image:", error);
       toast.error("❌ Failed to download image.");
     }
   };
 
-  const GenerateVideo = async (config: any) => {
-    setLoading(true);
-    const result = await axios.post("/api/generate-product-video", {
-      imageUrl: config?.finalProductUrl,
-      imageToVideoPrompt: config?.imageToVideoPrompt,
-      uid: user?.uid,
-      docId: config?.id,
-    });
-    setLoading(false);
+  // 🔹 Type for the config parameter
+  type VideoConfig = {
+    finalProductUrl?: string;
+    imageToVideoPrompt?: string;
+    id: string;
+  };
 
-    console.log(result.data);
+  // 🔹 Generate Video Function - Corrected Type
+  const GenerateVideo = async (config: VideoConfig) => {
+    setLoading(true);
+    try {
+      const result = await axios.post("/api/generate-product-video", {
+        imageUrl: config?.finalProductUrl,
+        imageToVideoPrompt: config?.imageToVideoPrompt,
+        uid: user?.uid,
+        docId: config?.id,
+      });
+      console.log(result.data);
+    } catch (error) {
+      console.error("Video generation failed:", error);
+      toast.error("❌ Failed to start video generation.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -117,21 +137,18 @@ function PreviewResult() {
             </CardHeader>
 
             <CardContent className="space-y-4">
-              {/* 🔹 Pending State → Skeleton */}
-              {product.status === "pending" ? (
-                <div className="space-y-3">
-                  <Skeleton className="w-full h-[200px] rounded-lg" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-8 w-16 rounded" />
-                    <Skeleton className="h-8 w-16 rounded" />
-                    <Skeleton className="h-8 w-24 rounded" />
-                  </div>
+              {/* 🔹 State-based Rendering */}
+              {product.status === "pending" || !product.finalProductUrl ? (
+                // Skeleton/Loading State
+                <div className="flex flex-col items-center justify-center h-[200px] rounded-lg bg-gray-200 dark:bg-gray-800">
+                  <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+                  <p className="text-muted-foreground mt-2">Generating Image...</p>
                 </div>
               ) : (
                 <>
                   {/* 🔹 Image */}
                   <Image
-                    src={product.finalProductUrl || product.productUrl || ""}
+                    src={product.finalProductUrl}
                     alt={product.productDescription}
                     width={500}
                     height={500}
@@ -146,20 +163,14 @@ function PreviewResult() {
                         size="icon"
                         variant="ghost"
                         className="cursor-pointer hover:bg-primary/10"
-                        onClick={() =>
-                          downloadImage(
-                            product.finalProductUrl || product.productUrl || ""
-                          )
-                        }
+                        onClick={() => downloadImage(product.finalProductUrl!)}
                       >
                         <Download className="w-5 h-5" />
                       </Button>
 
                       {/* View */}
                       <Link
-                        href={
-                          product.finalProductUrl || product.productUrl || ""
-                        }
+                        href={product.finalProductUrl || ""}
                         target="_blank"
                       >
                         <Button
@@ -185,19 +196,21 @@ function PreviewResult() {
                     </div>
 
                     {/* Animate */}
-
-                    {!product?.imageToVideoUrl && (
-                      <Button
-                        className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500
-                     to-indigo-500 hover:opacity-90 transition text-white"
-                        onClick={() => GenerateVideo(product)}
-                        disabled={product.imageToVideoStatus === "pending"}
-                      >
-                        {product.imageToVideoStatus === "pending" ? (
+                    {product.imageToVideoStatus === "pending" ? (
+                        <Button
+                          className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
+                          disabled
+                        >
                           <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-4 h-4" />
-                        )}
+                          <span>Processing...</span>
+                        </Button>
+                      ) : (
+                      <Button
+                        className="gap-2 cursor-pointer bg-gradient-to-r from-purple-500 to-indigo-500 hover:opacity-90 transition text-white"
+                        onClick={() => GenerateVideo(product)}
+                        disabled={!product.finalProductUrl}
+                      >
+                        <Sparkles className="w-4 h-4" />
                         Animate
                       </Button>
                     )}
