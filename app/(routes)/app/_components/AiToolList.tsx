@@ -27,7 +27,7 @@ const AiTools: AiTool[] = [
     name: "AI Product With Avatar",
     desc: "Bring your products to life with AI avatars.",
     bannerImage: "/product-avatar.png",
-    path: "/",
+    path: "app/creative-ai-tools/products-avatar",
   },
 ];
 

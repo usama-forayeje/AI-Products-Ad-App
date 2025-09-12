@@ -32,10 +32,17 @@ interface Props {
   onHandleInputChange: (field: string, value: unknown) => void;
   onGenerate: () => void;
   loading: boolean;
+  enableAvatar?: boolean;
 }
 
-function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
-  const [preview, setPreview] = useState<string | null>(null);
+function FormInput({
+  onHandleInputChange,
+  onGenerate,
+  loading,
+  enableAvatar,
+}: Props) {
+  const [productPreview, setProductPreview] = useState<string | null>(null); // Renamed from 'preview'
+  const [selectedAvatarName, setSelectedAvatarName] = useState<string | null>(null); // Renamed from 'selectedAvatar'
 
   const onFileSelect = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -44,9 +51,26 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
       alert("File size must be less than 5MB");
       return;
     }
-    onHandleInputChange("imageUrl", null); // Clear imageUrl when a file is selected
-    onHandleInputChange("file", file);
-    setPreview(URL.createObjectURL(file));
+    onHandleInputChange("imageUrl", null); // Clear sample product URL
+    onHandleInputChange("avatar", null); // Clear selected avatar URL
+    onHandleInputChange("file", file); // Set the uploaded file
+    setProductPreview(URL.createObjectURL(file)); // Set the product image preview
+    setSelectedAvatarName(null); // Deselect avatar
+  };
+
+  const onSampleProductSelect = (sample: string) => {
+    onHandleInputChange("file", null); // Clear uploaded file
+    onHandleInputChange("imageUrl", sample); // Set the sample product URL
+    onHandleInputChange("avatar", null); // Clear selected avatar URL
+    setProductPreview(sample); // Set the product image preview
+    setSelectedAvatarName(null); // Deselect avatar
+  };
+
+  const onAvatarSelect = (avatarUrl: string, avatarName: string) => {
+    onHandleInputChange("avatar", avatarUrl); // Set the selected avatar URL
+    setSelectedAvatarName(avatarName); // Set the selected avatar name for styling
+    // Crucially, we DO NOT clear productPreview or other product inputs here.
+    // The product image should remain visible if one was previously selected.
   };
 
   const sampleProduct: string[] = [
@@ -55,6 +79,39 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
     "/perfume.png",
     "/ice-creame.png",
     "/juice-can.png",
+  ];
+
+  const avatarList = [
+    {
+      name: "Avatar 1",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/images.jpeg?updatedAt=1757669138156",
+    },
+    {
+      name: "Avatar 2",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/download%20(1).jpeg?updatedAt=1757669096784",
+    },
+    {
+      name: "Avatar 3",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/download.jpeg?updatedAt=1757669076125",
+    },
+    {
+      name: "Avatar 4",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/__.webp?updatedAt=1757669042611",
+    },
+    {
+      name: "Avatar 5",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/portrait-pic1.webp?updatedAt=1757669027167",
+    },
+    {
+      name: "Avatar 6",
+      imageUrl:
+        "https://ik.imagekit.io/uhspb52oou/avatar/portrait-pic2.webp?updatedAt=1757668982652",
+    },
   ];
 
   return (
@@ -79,7 +136,7 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
             htmlFor="file"
             className="mt-3 border-dashed border-2 rounded-2xl flex flex-col justify-center items-center p-6 min-h-[200px] cursor-pointer w-full relative hover:bg-muted/40 transition-all"
           >
-            {!preview ? (
+            {!productPreview ? ( // Use productPreview here
               <div className="flex flex-col items-center gap-3 text-center">
                 <ImagePlus className="h-10 w-10 opacity-40" />
                 <p className="text-base font-medium">
@@ -89,8 +146,8 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
               </div>
             ) : (
               <Image
-                src={preview}
-                alt="preview"
+                src={productPreview} // Use productPreview here
+                alt="Product preview"
                 fill
                 className="object-contain rounded-lg"
               />
@@ -106,35 +163,59 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
         </div>
 
         {/* 🔹 Step 2: Pick Sample */}
-        <div>
-          <Label className="text-lg font-semibold">
-            2. Or Select a Sample Product
-          </Label>
-          <div className="flex flex-wrap gap-3 mt-3 justify-center sm:justify-start">
-            {sampleProduct.map((sample, index) => (
-              <button
-                type="button"
-                key={index}
-                onClick={() => {
-                  onHandleInputChange("file", null);
-                  onHandleInputChange("imageUrl", sample);
-                  setPreview(sample);
-                }}
-                className={`border rounded-lg overflow-hidden p-1 hover:scale-105 transition-transform ${
-                  preview === sample ? "ring-2 ring-primary" : ""
-                }`}
-              >
-                <Image
-                  src={sample}
-                  alt={`Sample product ${index + 1}`}
-                  width={70}
-                  height={70}
-                  className="rounded-md w-[70px] h-[70px] object-contain"
-                />
-              </button>
-            ))}
+        {!enableAvatar ? (
+          <div>
+            <Label className="text-lg font-semibold">
+              2. Or Select a Sample Product
+            </Label>
+            <div className="flex flex-wrap gap-3 mt-3 justify-center sm:justify-start">
+              {sampleProduct.map((sample, index) => (
+                <button
+                  type="button"
+                  key={index}
+                  onClick={() => onSampleProductSelect(sample)} // Use the new handler
+                  className={`border rounded-lg overflow-hidden p-1 hover:scale-105 transition-transform ${
+                    productPreview === sample ? "ring-2 ring-primary" : "" // Use productPreview here
+                  }`}
+                >
+                  <Image
+                    src={sample}
+                    alt={`Sample product ${index + 1}`}
+                    width={70}
+                    height={70}
+                    className="rounded-md w-[70px] h-[70px] object-contain"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>
+            <Label className="text-lg font-semibold">
+              2. Or Select a Sample Avatar
+            </Label>
+            <div className="flex flex-wrap gap-3 mt-3 justify-center sm:justify-start">
+              {avatarList.map((avatar, index) => (
+                <button
+                  type="button"
+                  key={index}
+                  onClick={() => onAvatarSelect(avatar.imageUrl, avatar.name)} // Use the new handler
+                  className={`border rounded-lg overflow-hidden p-1 hover:scale-105 transition-transform ${
+                    selectedAvatarName === avatar.name ? "ring-2 ring-primary" : ""
+                  }`}
+                >
+                  <Image
+                    src={avatar.imageUrl}
+                    alt={`Sample avatar ${index + 1}`}
+                    width={70}
+                    height={70}
+                    className="rounded-md w-[70px] h-[70px] object-contain cursor-pointer"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 🔹 Step 3: Description */}
         <div>
@@ -182,7 +263,7 @@ function FormInput({ onHandleInputChange, onGenerate, loading }: Props) {
         <div className="text-center">
           <Button
             className="mt-4 w-full flex items-center justify-center gap-2"
-            disabled={loading}
+            disabled={loading || !productPreview} // Disable if no product image is selected
             onClick={onGenerate}
           >
             {loading ? (

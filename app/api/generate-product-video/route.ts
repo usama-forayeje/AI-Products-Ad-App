@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     // 5️⃣ Update Firestore with uploaded video URL and status
     await updateDoc(doc(db, "user_ads", docId), {
-      videoUrl: uploadResult.url,
+      imageToVideoUrl: uploadResult.url,
       imageToVideoStatus: "completed",
     });
 

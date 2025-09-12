@@ -34,6 +34,7 @@ export async function POST(
     const size = (formData.get("size") as string) || "1024x1024";
     const imageUrl = (formData.get("imageUrl") as string)?.trim();
     const userEmail = (formData.get("userEmail") as string)?.trim();
+    const avatar = (formData.get("avatar") as string)?.trim();
 
     if (!userEmail) {
       return NextResponse.json(
@@ -66,6 +67,7 @@ export async function POST(
 
     console.log("🖼️ Processing image...");
     let imageBase64: string;
+    let avatarBase64: string | undefined;
     let mimeType: string;
 
     if (file) {
@@ -82,6 +84,11 @@ export async function POST(
       throw new Error("No valid image source provided");
     }
 
+    if (avatar) {
+      const avatarData = await processImageUrl(avatar);
+      avatarBase64 = avatarData.base64;
+    }
+
     console.log("☁️ Uploading original image...");
     const originalUpload = await uploadToImageKit(
       imageBase64,
@@ -91,12 +98,17 @@ export async function POST(
     );
 
     console.log("🤖 Generating AI prompts...");
-    const prompts = await generateAIPrompts(description, imageBase64);
+    const prompts = await generateAIPrompts(
+      description,
+      imageBase64,
+      avatarBase64
+    );
 
     console.log("🎨 Generating enhanced product image...");
     const generatedImageBase64 = await generateProductImage(
       imageBase64,
-      prompts.textToImage
+      prompts.textToImage,
+      avatarBase64
     );
 
     generatedBuffer = Buffer.from(generatedImageBase64, "base64");

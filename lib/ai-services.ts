@@ -8,7 +8,8 @@ import { genAI } from "./gimini";
  */
 export async function generateAIPrompts(
   productDescription: string,
-  imageBase64?: string
+  imageBase64?: string,
+  avatar?: string
 ): Promise<AIPrompts> {
   try {
     const systemPrompt = `You are a professional marketing AI that creates stunning product advertisements.
@@ -25,12 +26,23 @@ Return ONLY valid JSON in EXACT format:
 }
 No extra text or explanation.`;
 
+    const avatarSystemPrompt = `Create a vibrant product showcase image featuring the uploaded product image being heid naturally by the uploaded avatar image. 
+Position the product clearly in te avatar's hands, making it the fooal point of the scene. Surround the product with dynamic splashes of liquid or relevant materials that complement the product.
+use a clean, coloful background to make the product stand out. Add subtle floating elements related to the product's flavor , ingredients. or theme for extra context and visual interest.
+Ensure both the avatar and product are sharp, well-lit, and in focus. , while motion and energy are conveyed though the spiash effects. also give me image to video prompt for same in JSON format: {
+"textToImage": "<detailed prompt for image generation>"
+"imageToVideo": "<detailed prompt for video generation>",}
+No extra text or explanation.`;
+
     const userPrompt = `Product: ${productDescription}
     
 Please create professional marketing prompts for this product.`;
 
     const messages: any[] = [
-      { role: "system", content: systemPrompt },
+      {
+        role: "system",
+        content: avatar?.length > 2 ? avatarSystemPrompt : systemPrompt.trim(),
+      },
       { role: "user", content: userPrompt },
     ];
 
@@ -44,18 +56,30 @@ Please create professional marketing prompts for this product.`;
       ];
     }
 
+    if (avatar) {
+      messages[1].content = [
+        { type: "text", text: userPrompt },
+        {
+          type: "image_url",
+          image_url: { url: `data:image/jpeg;base64,${avatar}` },
+        },
+      ];
+    }
+
     const response = await serverOpenAI.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
       max_tokens: 500,
       temperature: 0.7,
+      response_format: { type: "json_object" },
     });
 
-    const content = response.choices[0]?.message?.content;
+    let content = response.choices[0]?.message?.content;
     if (!content) {
       throw new Error("No response from OpenAI");
     }
 
+    content = content.replace(/```json\s*|```/g, "").trim();
     const prompts = JSON.parse(content) as AIPrompts;
 
     if (!prompts.textToImage || !prompts.imageToVideo) {
@@ -78,44 +102,60 @@ Please create professional marketing prompts for this product.`;
  */
 export async function generateProductImage(
   imageBase64: string,
-  prompt: string
+  prompt: string,
+  avatar?: string
 ): Promise<string> {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-image-preview", // ✅ correct model
-    });
+  const MAX_RETRIES = 3;
+  let attempt = 0;
 
-    const response = await model.generateContent({
-      contents: [
-        {
-          parts: [
-            { text: prompt },
-            { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
-          ],
-        },
-      ],
-      generationConfig: {
-        responseModalities: ["IMAGE"],
-      },
-    });
+  while (attempt < MAX_RETRIES) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash-image-preview",
+      });
 
-    const candidate = response.response?.candidates?.[0];
-    if (!candidate) throw new Error("No candidates returned from Gemini");
+      const parts = [
+        { text: prompt },
+        { inlineData: { data: imageBase64, mimeType: "image/jpeg" } },
+      ];
 
-    for (const part of candidate.content.parts) {
-      if ("inlineData" in part && part.inlineData?.data) {
-        return part.inlineData.data; // Base64 image
+      if (avatar) {
+        parts.push({ inlineData: { data: avatar, mimeType: "image/jpeg" } });
       }
+
+      const response = await model.generateContent({
+        contents: [{ parts }],
+        generationConfig: {
+          responseModalities: ["IMAGE"],
+        },
+      });
+
+      const candidate = response.response?.candidates?.[0];
+      if (!candidate) throw new Error("No candidates returned from Gemini");
+
+      for (const part of candidate.content.parts) {
+        if ("inlineData" in part && part.inlineData?.data) {
+          return part.inlineData.data;
+        }
+      }
+
+      throw new Error("No image inlineData found in Gemini response");
+    } catch (error) {
+      console.error(`Attempt ${attempt + 1} failed:`, error);
+      if (attempt === MAX_RETRIES - 1) {
+        // If this is the last attempt, re-throw the error
+        throw new Error(
+          `Failed to generate product image after ${MAX_RETRIES} attempts: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+      }
+      attempt++;
+      // Wait before retrying (exponential backoff is a good practice)
+      await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
     }
-
-    throw new Error("No image inlineData found in Gemini response");
-  } catch (error) {
-    console.error("❌ Gemini Image Generation Error:", error);
-    throw new Error(
-      `Failed to generate product image: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
   }
-}
 
+  // This line should technically be unreachable, but good for type safety
+  throw new Error("Failed to generate product image after all retries.");
+}

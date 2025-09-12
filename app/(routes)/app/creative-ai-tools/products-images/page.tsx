@@ -10,9 +10,16 @@ type FormData = {
   description: string;
   size: string;
   imageUrl?: string;
+  avatar?: string;
 };
 
-const ProductImages = ({ title }: { title: string }) => {
+const ProductImages = ({
+  title,
+  enableAvatar,
+}: {
+  title: string;
+  enableAvatar?: boolean;
+}) => {
   const [formData, setFormData] = useState<FormData>({
     file: null,
     description: "",
@@ -52,6 +59,7 @@ const ProductImages = ({ title }: { title: string }) => {
       formPayload.append("description", formData.description);
       formPayload.append("size", formData.size || "1028x1028");
       formPayload.append("userEmail", user?.email || "");
+      formPayload.append("avatar", formData.avatar || "");
 
       const result = await axios.post(
         "/api/generate-product-image",
@@ -65,7 +73,6 @@ const ProductImages = ({ title }: { title: string }) => {
       setLoading(false);
     }
   };
-
 
   return (
     <div>
@@ -81,6 +88,7 @@ const ProductImages = ({ title }: { title: string }) => {
             }
             onGenerate={OnGenerate}
             loading={loading}
+            enableAvatar={enableAvatar}
           />
         </div>
         <div className="md:col-span-2 flex flex-col gap-4 justify-between  ">
