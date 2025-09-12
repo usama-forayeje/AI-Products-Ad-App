@@ -10,11 +10,11 @@ import { Download, Eye, Loader2, Play, Sparkles } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import axios from "axios";
 
 // 🔹 Types
-type PreviewProductType = {
+export type PreviewProductType = {
   id: string;
   email: string;
   status: string;
