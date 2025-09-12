@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FormInput from "../_components/FormInput";
 import PreviewResult from "../_components/PreviewResult";
 import axios from "axios";
 import { useAuthContext } from "@/app/provider";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   file: File | null;
@@ -26,8 +27,13 @@ const ProductImages = ({
     size: "",
     imageUrl: "",
   });
+  const router = useRouter();
   const { user } = useAuthContext();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user)  router.replace("/login");
+  }, [user]);
 
   const onHandleInputChange = (field: string, value: unknown) => {
     setFormData((prev) => ({

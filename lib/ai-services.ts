@@ -2,6 +2,7 @@
 import { serverOpenAI } from "@/lib/openAI";
 import { AIPrompts } from "@/types/product-ad";
 import { genAI } from "./gimini";
+import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 /**
  * 🎨 Generate AI prompts using OpenAI (SERVER-SIDE ONLY)
@@ -38,7 +39,7 @@ No extra text or explanation.`;
     
 Please create professional marketing prompts for this product.`;
 
-    const messages: any[] = [
+    const messages: ChatCompletionMessageParam[] = [
       {
         role: "system",
         content: avatar?.length > 2 ? avatarSystemPrompt : systemPrompt.trim(),

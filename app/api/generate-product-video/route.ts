@@ -57,10 +57,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: uploadResult.url, success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("=== VIDEO GENERATION ERROR ===", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: error },
       { status: 500 }
     );
   }

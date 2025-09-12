@@ -6,8 +6,11 @@ export const imagekit = new ImageKit({
   privateKey: process.env.NEXT_PUBLIC_IMAGEKIT_PRIVET_KEY!,
 });
 
-// Helper function for client-side usage
-export const getImageKitUrl = (filePath: string, transformations?: any[]) => {
+// Corrected function with proper typing
+export const getImageKitUrl = (
+  filePath: string,
+  transformations?: ImageKit.Transformation[]
+) => {
   return imagekit.url({
     path: filePath,
     transformation: transformations,

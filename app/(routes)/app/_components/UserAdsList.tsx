@@ -112,6 +112,7 @@ function UserAdsList() {
 
       toast.success("✅ Image downloaded successfully!");
     } catch (error) {
+      console.error("Failed to download image:", error);
       toast.error("❌ Failed to download image.");
     }
   };
@@ -183,7 +184,9 @@ function UserAdsList() {
             You don&apos;t have any ads. Let&apos;s create a new one!
           </h2>
           <Button>
-            <Link href={"/creative-ai-tools/product-ad-generator"}>
+            <Link
+              href={user ? "/creative-ai-tools/products-images" : "/login"}
+            >
               Create New Ad
             </Link>
           </Button>

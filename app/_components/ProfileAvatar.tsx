@@ -21,6 +21,7 @@ function ProfileAvatar() {
         router.replace("/");
       })
       .catch((error) => {
+        console.error(error);
         // An error happened.
       });
   };

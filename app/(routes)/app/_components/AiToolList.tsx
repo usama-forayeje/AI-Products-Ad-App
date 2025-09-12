@@ -1,3 +1,5 @@
+"use client";
+import { useAuthContext } from "@/app/provider";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,6 +34,7 @@ const AiTools: AiTool[] = [
 ];
 
 function AiToolList() {
+  const { user } = useAuthContext();
   return (
     <div className=" mx-auto px-4 py-8">
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8 text-center md:text-left">
@@ -74,7 +77,10 @@ function AiToolList() {
                   {/* Button at bottom of text section */}
                   <div className="mt-auto">
                     <Button className="w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 text-base">
-                      <Link href={tool.path} className="block">
+                      <Link
+                        href={user ? tool.path : "/login"}
+                        className="block"
+                      >
                         Create Now
                       </Link>
                     </Button>

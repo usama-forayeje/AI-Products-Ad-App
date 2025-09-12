@@ -1,8 +1,9 @@
-'use client';
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Authentication from "@/app/_components/Authentication";
+import Image from "next/image";
 
 export function LoginForm({
   className,
@@ -24,8 +25,8 @@ export function LoginForm({
               </h1>
               <p className="text-muted-foreground mt-2">
                 Sign in to your{" "}
-                <span className="font-semibold text-pink-600">Account</span>{" "}
-                By Usama Forayaje
+                <span className="font-semibold text-pink-600">Account</span> By
+                Usama Forayaje
               </p>
             </div>
 
@@ -51,7 +52,7 @@ export function LoginForm({
 
           {/* Right Side - Image */}
           <div className="relative hidden md:block">
-            <img
+            <Image
               src="/login.jpg" // replace with illustration or stock photo
               alt="Login illustration"
               className="absolute inset-0 h-[500px] w-full object-cover rounded-r-2xl"
